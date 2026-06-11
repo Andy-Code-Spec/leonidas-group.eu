@@ -181,11 +181,9 @@ a{color:inherit;text-decoration:none}h1,h2,h3{font-family:var(--serif);font-weig
  <section class="section closing" id="kontakt"><div class="wrap inner reveal">
   <p class="eyebrow" data-i18n="closing.eyebrow"></p><h2 data-i18n="closing.headline"></h2>
   <p class="lead muted-on-navy" style="margin:0 auto" data-i18n="closing.body"></p>
-  <form id="contactForm" class="contact-form reveal" action="https://api.web3forms.com/submit" method="POST" autocomplete="on">
+  <form id="contactForm" class="contact-form reveal" autocomplete="on">
    <input type="hidden" name="subject" value="LEONIDAS – Get in touch (Website)">
    <input type="hidden" name="from_name" value="LEONIDAS Website">
-   <input type="hidden" name="access_key" value="05e0cd61-a45a-41bf-ba6a-106ada6f83bc">
-   <input type="hidden" name="redirect" value="https://web3forms.com/success">
    <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
    <p class="form-intro" data-i18n="x.form.intro"></p>
    <div class="row2">
@@ -266,7 +264,7 @@ function render(lang){var L=I18N[lang]||I18N.de;
 document.querySelectorAll("[data-lang]").forEach(function(b){b.addEventListener("click",function(){render(b.getAttribute("data-lang"));var dd=document.querySelector(".lang-dd");if(dd)dd.removeAttribute("open");});});
 function detect(){try{var s=localStorage.getItem("leonidas_lang");if(s&&SUP.indexOf(s)>=0)return s;}catch(e){}var b=(navigator.language||"de").slice(0,2).toLowerCase();return SUP.indexOf(b)>=0?b:"de";}
 var cf=document.getElementById("contactForm");
-if(cf&&window.fetch){cf.addEventListener("submit",function(ev){ev.preventDefault();
+if(cf){cf.addEventListener("submit",function(ev){ev.preventDefault();
  var lang=document.documentElement.lang||"de";var X=(I18N[lang]||I18N.de).x||{};var L=X.form||{};
  var st=document.getElementById("formStatus");var btn=cf.querySelector("button[type=submit]");
  var data={};new FormData(cf).forEach(function(v,k){if(k!=="interest")data[k]=v;});
@@ -274,8 +272,9 @@ if(cf&&window.fetch){cf.addEventListener("submit",function(ev){ev.preventDefault
  data.interest=ints.join(", ");data.access_key="05e0cd61-a45a-41bf-ba6a-106ada6f83bc";
  btn.disabled=true;btn.textContent=L.sending||"...";st.className="form-status";st.textContent="";
  fetch("https://api.web3forms.com/submit",{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify(data)})
- .then(function(r){return r.json();}).then(function(j){btn.disabled=false;btn.textContent=L.submit||"Send";if(j&&j.success){cf.reset();st.className="form-status ok";st.textContent=L.success||"OK";}else{st.className="form-status err";st.textContent=(j&&j.message)?j.message:(L.error||"Error");}})
- .catch(function(){cf.submit();});
+ .then(function(r){return r.json();}).then(function(j){if(j&&j.success){cf.reset();st.className="form-status ok";st.textContent=L.success||"OK";}else{st.className="form-status err";st.textContent=L.error||"Error";}})
+ .catch(function(){st.className="form-status err";st.textContent=L.error||"Error";})
+ .then(function(){btn.disabled=false;btn.textContent=L.submit||"Send";});
 });}
 render(detect());
 })();
